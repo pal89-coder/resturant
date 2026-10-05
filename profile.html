@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - YARMUK Restaurant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                <span class="logo-text">YARMUK</span>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="profile.html" class="nav-link active">Profile</a>
+                <a href="#" class="nav-link" id="logoutBtn">Logout</a>
+                <a href="index-arabic.html" class="lang-badge-nav">العربية</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Profile Section -->
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo">
+                    </div>
+                    <h1 class="login-title">My Profile</h1>
+                    <p class="login-subtitle">Manage your account and reservations</p>
+                </div>
+                
+                <div class="login-form" id="profileContent">
+                    <div class="user-info">
+                        <h3>Account Information</h3>
+                        <div class="info-item">
+                            <label>Username:</label>
+                            <span id="profileUsername">Loading...</span>
+                        </div>
+                        <div class="info-item">
+                            <label>Email:</label>
+                            <span id="profileEmail">Loading...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="reservations-section">
+                        <h3>My Reservations</h3>
+                        <div id="reservationsList">
+                            <p>Loading your reservations...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="database-stats">
+                        <h3>Database Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-number" id="userCount">0</span>
+                                <span class="stat-label">Users</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="reservationCount">0</span>
+                                <span class="stat-label">Reservations</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-number" id="messageCount">0</span>
+                                <span class="stat-label">Messages</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                    <span>YARMUK</span>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#about">About</a>
+                    <a href="index.html#contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 YARMUK Restaurant. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="database.js"></script>
+    <script src="script.js"></script>
+    <script src="profile.js"></script>
+</body>
+</html>

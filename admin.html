@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - YARMUK Restaurant</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="login.css">
+    <style>
+        .admin-dashboard {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .admin-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .admin-section h2 {
+            color: var(--primary-pink);
+            margin-bottom: 1.5rem;
+        }
+        
+        .export-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        
+        .export-btn {
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .export-btn.primary {
+            background: var(--primary-pink);
+            color: white;
+        }
+        
+        .export-btn.primary:hover {
+            background: var(--secondary-pink);
+            transform: translateY(-2px);
+        }
+        
+        .export-btn.secondary {
+            background: var(--primary-blue);
+            color: white;
+        }
+        
+        .export-btn.secondary:hover {
+            background: var(--secondary-blue);
+            transform: translateY(-2px);
+        }
+        
+        .export-btn.success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .export-btn.success:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #fce4ec 0%, #e3f2fd 100%);
+            padding: 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: var(--primary-pink);
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .loading.active {
+            display: block;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary-pink);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                <span class="logo-text">YARMUK</span>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="profile.html" class="nav-link">Profile</a>
+                <a href="admin.html" class="nav-link active">Admin</a>
+                <a href="index-arabic.html" class="lang-badge-nav">العربية</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Admin Dashboard -->
+    <section class="login-section">
+        <div class="container">
+            <div class="admin-dashboard">
+                <div class="admin-header">
+                    <h1>Admin Dashboard</h1>
+                    <p>Database Management & Data Export</p>
+                </div>
+                
+                <!-- Statistics Section -->
+                <div class="admin-section">
+                    <h2>Database Statistics</h2>
+                    <div class="loading" id="statsLoading">
+                        <div class="spinner"></div>
+                        <p>Loading statistics...</p>
+                    </div>
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="userCount">0</div>
+                            <div class="stat-label">Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="reservationCount">0</div>
+                            <div class="stat-label">Reservations</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="messageCount">0</div>
+                            <div class="stat-label">Messages</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="menuItemCount">0</div>
+                            <div class="stat-label">Menu Items</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Export Section -->
+                <div class="admin-section">
+                    <h2>Data Export</h2>
+                    <p style="margin-bottom: 1.5rem; color: var(--text-muted);">
+                        Export all database data in various formats for backup or analysis.
+                    </p>
+                    <div class="export-buttons">
+                        <button class="export-btn primary" onclick="exportJSON()">
+                            📄 Export JSON
+                        </button>
+                        <button class="export-btn secondary" onclick="exportDatabase()">
+                            💾 Download Database
+                        </button>
+                        <button class="export-btn success" onclick="refreshStats()">
+                            🔄 Refresh Stats
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Server Status -->
+                <div class="admin-section">
+                    <h2>Server Status</h2>
+                    <div id="serverStatus">
+                        <p>Checking server status...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                    <span>YARMUK</span>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="profile.html">Profile</a>
+                    <a href="admin.html">Admin</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 YARMUK Restaurant. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const API_BASE = 'http://localhost:3000/api';
+        
+        // Load statistics on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStatistics();
+            checkServerStatus();
+        });
+        
+        async function loadStatistics() {
+            const loading = document.getElementById('statsLoading');
+            const statsGrid = document.getElementById('statsGrid');
+            
+            loading.classList.add('active');
+            statsGrid.style.opacity = '0.5';
+            
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                const data = await response.json();
+                
+                document.getElementById('userCount').textContent = data.users;
+                document.getElementById('reservationCount').textContent = data.reservations;
+                document.getElementById('messageCount').textContent = data.messages;
+                document.getElementById('menuItemCount').textContent = data.menuItems;
+            } catch (error) {
+                console.error('Error loading statistics:', error);
+                alert('Failed to load statistics. Make sure the server is running.');
+            } finally {
+                loading.classList.remove('active');
+                statsGrid.style.opacity = '1';
+            }
+        }
+        
+        async function exportJSON() {
+            try {
+                const response = await fetch(`${API_BASE}/export`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    const jsonStr = JSON.stringify(data.data, null, 2);
+                    const blob = new Blob([jsonStr], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `yarmuk_export_${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('Data exported successfully!');
+                }
+            } catch (error) {
+                console.error('Error exporting data:', error);
+                alert('Failed to export data. Make sure the server is running.');
+            }
+        }
+        
+        async function exportDatabase() {
+            try {
+                const response = await fetch(`${API_BASE}/download-database`);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `yarmuk_database_${new Date().toISOString().split('T')[0]}.db`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    
+                    alert('Database downloaded successfully!');
+                } else {
+                    throw new Error('Download failed');
+                }
+            } catch (error) {
+                console.error('Error downloading database:', error);
+                alert('Failed to download database. Make sure the server is running.');
+            }
+        }
+        
+        function refreshStats() {
+            loadStatistics();
+        }
+        
+        async function checkServerStatus() {
+            const statusDiv = document.getElementById('serverStatus');
+            
+            try {
+                const response = await fetch(`${API_BASE}/stats`);
+                if (response.ok) {
+                    statusDiv.innerHTML = `
+                        <div style="color: #4CAF50; font-weight: bold;">
+                            ✅ Server is running
+                        </div>
+                        <p style="margin-top: 0.5rem; color: var(--text-muted);">
+                            API: ${API_BASE}
+                        </p>
+                    `;
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div style="color: #f44336; font-weight: bold;">
+                        ❌ Server is not running
+                    </div>
+                    <p style="margin-top: 0.5rem; color: var(--text-muted);">
+                        Start the server with: <code>npm start</code>
+                    </p>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,159 @@
+/* Arabic-specific styles for RTL layout */
+
+/* Base font for Arabic */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* RTL-specific adjustments */
+.header .container {
+    direction: rtl;
+}
+
+.nav {
+    direction: rtl;
+}
+
+.hero-left-badges {
+    left: auto;
+    right: 2rem;
+}
+
+.hero-left-badge:hover {
+    transform: translateX(-5px);
+}
+
+.hero-badges-row {
+    direction: rtl;
+}
+
+.hero-buttons {
+    direction: rtl;
+}
+
+.features-grid {
+    direction: rtl;
+}
+
+.breakfast-grid,
+.menu-grid,
+.drinks-grid,
+.sweets-grid {
+    direction: rtl;
+}
+
+.about-content {
+    direction: rtl;
+}
+
+.about-stats {
+    direction: rtl;
+}
+
+.reservation-form {
+    direction: rtl;
+}
+
+.contact-grid {
+    direction: rtl;
+}
+
+.contact-info {
+    direction: rtl;
+}
+
+.footer-content {
+    direction: rtl;
+}
+
+.footer-links {
+    direction: rtl;
+}
+
+.footer-social {
+    direction: rtl;
+}
+
+/* Language badge in navigation - RTL version */
+.lang-badge-nav {
+    background: rgba(233, 30, 99, 0.9);
+    border-color: var(--primary-pink);
+}
+
+.lang-badge-nav:hover {
+    background: var(--secondary-pink);
+}
+
+/* Form RTL adjustments */
+.form-row {
+    direction: rtl;
+}
+
+/* Responsive RTL adjustments */
+@media (max-width: 768px) {
+    .hero-left-badges {
+        right: auto;
+        left: auto;
+        direction: rtl;
+    }
+    
+    .nav {
+        direction: rtl;
+    }
+}
+
+@media (max-width: 480px) {
+    .hero-left-badges {
+        flex-direction: column;
+        align-items: center;
+        direction: rtl;
+    }
+}
+
+/* Arabic text improvements */
+.hero-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
+
+.section-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: bold;
+}
+
+.hero-pill-badge,
+.hero-left-badge {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Ensure proper RTL text alignment */
+p, h1, h2, h3, h4, h5, h6 {
+    text-align: right;
+}
+
+.hero-content {
+    text-align: center;
+}
+
+.hero-title {
+    text-align: center;
+}
+
+.hero-subtitle {
+    text-align: center;
+}
+
+.section-title,
+.section-subtitle {
+    text-align: center;
+}
+
+/* Navigation links RTL adjustments */
+.nav-link::after {
+    right: 0;
+    left: auto;
+}
+
+.nav-link:hover::after {
+    width: 100%;
+}
