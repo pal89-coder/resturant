@@ -1,0 +1,7 @@
+{
+  "name": "YARMUK - Fine Dining Restaurant",
+  "description": "Fine dining restaurant web application featuring authentic recipes, reservation booking, menu exploration, user account management, and database export admin tools.",
+  "capabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -1,5 +1,5 @@
 // Export SQLite Database Data
-const Database = require('better-sqlite3');
+const Database = require('./in-memory-db');
 const path = require('path');
 const fs = require('fs');
 
@@ -14,6 +14,8 @@ function exportDatabase() {
         }
         
         // Connect to database
+        const { initializeDatabase } = require('./init');
+        initializeDatabase();
         const db = new Database(dbPath);
         
         console.log('📊 Starting database export...');
@@ -78,7 +80,7 @@ function exportDatabase() {
         
         // Copy the database file
         const dbCopyPath = path.join(exportPath, `yarmuk_backup_${Date.now()}.db`);
-        const dbData = fs.readFileSync(dbPath);
+        const dbData = typeof db.export === 'function' ? db.export() : (fs.existsSync(dbPath) ? fs.readFileSync(dbPath) : Buffer.from(''));
         fs.writeFileSync(dbCopyPath, dbData);
         console.log(`✅ Created database backup: yarmuk_backup_${Date.now()}.db`);
         

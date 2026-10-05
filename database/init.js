@@ -1,7 +1,7 @@
 // SQLite Database Initialization for YARMUK Restaurant
-const Database = require('better-sqlite3');
+const Database = require('./in-memory-db');
 const path = require('path');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
 
 // Database file path
 const dbPath = path.join(__dirname, '..', 'yarmuk.db');

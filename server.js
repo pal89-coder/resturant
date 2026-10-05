@@ -3,13 +3,17 @@ const express = require('express');
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const path = require('path');
-const Database = require('better-sqlite3');
-const bcrypt = require('bcrypt');
+const Database = require('./database/in-memory-db');
+const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { initializeDatabase } = require('./database/init');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
+
+// Ensure database schema and seed data are initialized
+initializeDatabase();
 
 // Database connection
 const dbPath = path.join(__dirname, 'yarmuk.db');
@@ -247,8 +251,8 @@ app.get('/', (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-    console.log(`🚀 Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Server running on http://0.0.0.0:${PORT}`);
     console.log(`📁 Database: ${dbPath}`);
     console.log(`🔑 JWT Secret: ${JWT_SECRET.substring(0, 10)}...`);
 });

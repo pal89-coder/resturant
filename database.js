@@ -68,6 +68,19 @@ class DatabaseManager {
         `);
 
         console.log('Database tables created successfully');
+
+        // Seed initial sample users and reservations if empty
+        try {
+            const check = this.db.exec("SELECT COUNT(*) as count FROM users");
+            if (check && check.length > 0 && check[0].values[0][0] === 0) {
+                this.registerUser('admin', 'admin@yarmuk.com', 'password123');
+                this.registerUser('user1', 'user1@example.com', 'password123');
+                this.addReservation(1, 'John Doe', 'john@example.com', '+1 555-123-4567', '2024-10-15', '19:00', 4);
+                this.addReservation(2, 'Jane Smith', 'jane@example.com', '+1 555-987-6543', '2024-10-20', '20:00', 2);
+            }
+        } catch (e) {
+            console.warn('Sample data seed note:', e);
+        }
     }
 
     // User operations

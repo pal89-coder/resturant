@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - YARMUK Restaurant</title>
+    <meta name="description" content="Create an account at YARMUK Restaurant for reservations and exclusive dining experiences.">
+    <meta property="og:title" content="Sign Up - YARMUK Restaurant">
+    <meta property="og:description" content="Create an account at YARMUK Restaurant for reservations and exclusive dining experiences.">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                <span class="logo-text">YARMUK</span>
+            </div>
+            <nav class="nav">
+                <a href="index.html" class="nav-link">Home</a>
+                <a href="login.html" class="nav-link">Login</a>
+                <a href="index-arabic.html" class="lang-badge-nav">العربية</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Signup Section -->
+    <section class="login-section">
+        <div class="container">
+            <div class="login-container">
+                <div class="login-header">
+                    <div class="login-logo">
+                        <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo">
+                    </div>
+                    <h1 class="login-title">Join YARMUK</h1>
+                    <p class="login-subtitle">Create your personal dining account</p>
+                </div>
+                
+                <form class="signup-form">
+                    <div class="form-group">
+                        <label for="reg-username">Username</label>
+                        <input type="text" id="reg-username" name="username" placeholder="Choose a username" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg-email">Email</label>
+                        <input type="email" id="reg-email" name="email" placeholder="Enter your email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="reg-password">Password</label>
+                        <input type="password" id="reg-password" name="password" placeholder="At least 6 characters" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="reg-confirm">Confirm Password</label>
+                        <input type="password" id="reg-confirm" name="confirmPassword" placeholder="Confirm your password" required>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+                    
+                    <div class="signup-link" style="margin-top: 1.5rem;">
+                        <p>Already have an account? <a href="login.html">Sign in</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="restaurant-logo.webp" alt="YARMUK Restaurant Logo" class="logo-icon">
+                    <span>YARMUK</span>
+                </div>
+                <div class="footer-links">
+                    <a href="index.html">Home</a>
+                    <a href="index.html#about">About</a>
+                    <a href="index.html#contact">Contact</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2024 YARMUK Restaurant. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="database.js"></script>
+    <script>
+        const form = document.querySelector('.signup-form');
+        if (form) {
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('reg-username').value.trim();
+                const email = document.getElementById('reg-email').value.trim();
+                const password = document.getElementById('reg-password').value;
+                const confirm = document.getElementById('reg-confirm').value;
+
+                if (password !== confirm) {
+                    alert('Passwords do not match.');
+                    return;
+                }
+                if (password.length < 6) {
+                    alert('Password must be at least 6 characters.');
+                    return;
+                }
+
+                const btn = form.querySelector('button[type="submit"]');
+                const origText = btn.textContent;
+                btn.textContent = 'Creating account...';
+                btn.disabled = true;
+
+                try {
+                    // Try server registration first
+                    const res = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        alert('Account created successfully! Please sign in.');
+                        window.location.href = 'login.html';
+                        return;
+                    } else if (data.error) {
+                        alert(data.error);
+                        return;
+                    }
+                } catch (err) {
+                    console.warn('Server registration fallback to client DB:', err);
+                } finally {
+                    btn.textContent = origText;
+                    btn.disabled = false;
+                }
+
+                // Client-side DB fallback
+                if (!dbManager && typeof initializeDatabase === 'function') {
+                    await initializeDatabase();
+                }
+                if (dbManager) {
+                    const result = dbManager.registerUser(username, email, password);
+                    if (result.success) {
+                        alert('Account created successfully! Please sign in.');
+                        window.location.href = 'login.html';
+                    } else {
+                        alert(result.message);
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
