@@ -114,16 +114,22 @@ app.get('/api/profile', authenticateToken, (req, res) => {
     }
 });
 
-// Create Reservation
-app.post('/api/reservations', authenticateToken, (req, res) => {
+// Create Reservation (guest or authenticated user)
+app.post('/api/reservations', optionalAuthenticateToken, (req, res) => {
     try {
         const { name, email, phone, date, time, guests } = req.body;
+        
+        if (!name || !email || !phone || !date || !time || !guests) {
+            return res.status(400).json({ error: 'All reservation fields are required' });
+        }
+
+        const userId = (req.user && req.user.userId) ? req.user.userId : null;
         
         const stmt = db.prepare(`
             INSERT INTO reservations (user_id, name, email, phone, date, time, guests)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         `);
-        const result = stmt.run(req.user.userId, name, email, phone, date, time, guests);
+        const result = stmt.run(userId, name, email, phone, date, time, guests);
         
         res.status(201).json({ 
             success: true, 
@@ -241,6 +247,26 @@ function authenticateToken(req, res, next) {
             return res.status(403).json({ error: 'Invalid token' });
         }
         req.user = user;
+        next();
+    });
+}
+
+// Middleware: Optional JWT Token (user can be authenticated or guest)
+function optionalAuthenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    
+    if (!token) {
+        req.user = null;
+        return next();
+    }
+    
+    jwt.verify(token, JWT_SECRET, (err, user) => {
+        if (!err && user) {
+            req.user = user;
+        } else {
+            req.user = null;
+        }
         next();
     });
 }

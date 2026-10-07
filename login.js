@@ -35,39 +35,52 @@ if (loginForm) {
             submitButton.disabled = true;
             
             try {
-                // Initialize database if not already done
-                if (!dbManager) {
-                    await initializeDatabase();
-                }
-                
-                if (dbManager) {
-                    // Attempt login with database
-                    const result = dbManager.loginUser(username, password);
-                    
-                    if (result.success) {
-                        // Store user session
-                        localStorage.setItem('currentUser', JSON.stringify(result.user));
-                        
-                        // Store login info if remember me is checked
-                        if (remember) {
-                            localStorage.setItem('rememberedUser', username);
-                            localStorage.setItem('rememberedEmail', email);
-                        } else {
-                            localStorage.removeItem('rememberedUser');
-                            localStorage.removeItem('rememberedEmail');
+                let loginSuccess = false;
+                let loggedInUser = null;
+                let loginErrorMessage = '';
+
+                // 1. Try server login first
+                try {
+                    const response = await fetch('/api/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, password })
+                    });
+                    const data = await response.json();
+                    if (response.ok && data.success) {
+                        loginSuccess = true;
+                        loggedInUser = data.user;
+                        if (data.token) {
+                            localStorage.setItem('token', data.token);
                         }
-                        
-                        alert(isArabic ? `مرحباً بعودتك، ${username}! تم تسجيل الدخول بنجاح.` : `Welcome back, ${username}! Login successful.`);
-                        
-                        // Redirect to appropriate home page
-                        window.location.href = isArabic ? 'index-arabic.html' : 'index.html';
-                    } else {
-                        alert(isArabic ? result.message : result.message);
+                    } else if (data.error) {
+                        loginErrorMessage = data.error;
                     }
-                } else {
-                    // Fallback to simple validation if database fails
-                    alert(isArabic ? `مرحباً بعودتك، ${username}! تم تسجيل الدخول بنجاح.` : `Welcome back, ${username}! Login successful.`);
+                } catch (netErr) {
+                    console.warn('Server login request failed, trying client db:', netErr);
+                }
+
+                // 2. Client-side database fallback
+                if (!loginSuccess) {
+                    if (!dbManager && typeof initializeDatabase === 'function') {
+                        await initializeDatabase();
+                    }
+                    if (dbManager) {
+                        const result = dbManager.loginUser(username, password);
+                        if (result.success) {
+                            loginSuccess = true;
+                            loggedInUser = result.user;
+                        } else if (!loginErrorMessage) {
+                            loginErrorMessage = result.message;
+                        }
+                    }
+                }
+
+                if (loginSuccess && loggedInUser) {
+                    // Store user session
+                    localStorage.setItem('currentUser', JSON.stringify(loggedInUser));
                     
+                    // Store login info if remember me is checked
                     if (remember) {
                         localStorage.setItem('rememberedUser', username);
                         localStorage.setItem('rememberedEmail', email);
@@ -76,7 +89,14 @@ if (loginForm) {
                         localStorage.removeItem('rememberedEmail');
                     }
                     
-                    window.location.href = isArabic ? 'index-arabic.html' : 'index.html';
+                    alert(isArabic ? `مرحباً بعودتك، ${loggedInUser.username}! تم تسجيل الدخول بنجاح.` : `Welcome back, ${loggedInUser.username}! Login successful.`);
+                    
+                    // Redirect to appropriate home page
+                    setTimeout(() => {
+                        window.location.href = isArabic ? 'index-arabic.html' : 'index.html';
+                    }, 500);
+                } else {
+                    alert(loginErrorMessage || (isArabic ? 'بيانات الاعتماد غير صحيحة.' : 'Invalid credentials.'));
                 }
             } catch (error) {
                 console.error('Login error:', error);

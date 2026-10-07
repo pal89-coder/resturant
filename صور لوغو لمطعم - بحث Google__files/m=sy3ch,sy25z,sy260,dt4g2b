@@ -1,9 +1,0 @@
-loaded_h_0(function(_){var window=this;
-_.fH=function(){if(window.google&&window.google.kHL)return google.kHL;var a=_.sd("GWsdKe");return a.Mb()?a.Fb(""):""};_.eH=function(){var a=_.sd("GWsdKe");return a.Mb()?a.Fb("").split("-",2)[1]||"":""};
-_.epa(_.cr,_.u1a);
-_.Jxe=function(a){a.isAvailable()&&(_.da.silk=_.da.silk||{},_.da.silk.s=_.da.silk.s||{},_.da.silk.s.sis={},_.da.silk.s.sis.ca=a.Dx.bind(a))};
-_.v("dt4g2b");
-_.$f(class{isAvailable(){return!0}Dx({ZT:a,Jha:b,qja:c,RMb:d}={}){a!==void 0?_.ti({serviceName:"sis",Nd:"ca",Bs:1}):_.ti({serviceName:"sis",Nd:"caar",Bs:1});a:switch(c){case 0:c="https://accounts.google.com/ServiceLogin";break a;default:c="https://accounts.google.com/AccountChooser"}a={hl:_.fH(),"continue":a||_.Vt().toString()};d&&(a.ec=d);d=_.cla(c,a);_.mf(d,b)}},_.ybb);
-_.w();
-});
-// Google Inc.

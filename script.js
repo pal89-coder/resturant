@@ -24,7 +24,53 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// Form submission handling with SQLite database
+// Non-blocking toast notification for iframe environment compatibility
+function showAppNotification(message) {
+    let container = document.getElementById('app-toast-container');
+    if (!container) {
+        container = document.createElement('div');
+        container.id = 'app-toast-container';
+        container.style.cssText = 'position:fixed;top:24px;right:24px;z-index:99999;display:flex;flex-direction:column;gap:12px;max-width:380px;pointer-events:none;';
+        document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.style.cssText = 'background:#1a1a1a;color:#ffffff;padding:14px 20px;border-radius:12px;font-size:0.95rem;box-shadow:0 8px 30px rgba(0,0,0,0.3);border-left:4px solid #E91E63;opacity:0;transform:translateY(-10px);transition:all 0.3s ease;pointer-events:auto;';
+    toast.textContent = message;
+    container.appendChild(toast);
+    requestAnimationFrame(() => {
+        toast.style.opacity = '1';
+        toast.style.transform = 'translateY(0)';
+    });
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(-10px)';
+        setTimeout(() => toast.remove(), 350);
+    }, 4000);
+}
+
+// Override window.alert to avoid blocking browser modals in iframes
+window.alert = function(msg) {
+    showAppNotification(msg);
+};
+
+// Update navigation for logged in user
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        const currentUserStr = localStorage.getItem('currentUser');
+        if (currentUserStr) {
+            const user = JSON.parse(currentUserStr);
+            const isArabic = document.documentElement.lang === 'ar';
+            document.querySelectorAll('a[href="login.html"]').forEach(link => {
+                link.href = 'profile.html';
+                link.textContent = isArabic ? `الملف الشخصي (${user.username})` : `Profile (${user.username})`;
+            });
+        }
+    } catch (e) {
+        console.warn('Error reading currentUser from localStorage:', e);
+    }
+});
+
+// Form submission handling with SQLite database & API
 const reservationForm = document.querySelector('.reservation-form');
 if (reservationForm) {
     reservationForm.addEventListener('submit', async (e) => {
@@ -46,18 +92,44 @@ if (reservationForm) {
             submitButton.disabled = true;
             
             try {
-                // Initialize database if not already done
-                if (!dbManager) {
+                let savedOnServer = false;
+                
+                // 1. Try sending to Server API
+                try {
+                    const token = localStorage.getItem('token');
+                    const headers = { 'Content-Type': 'application/json' };
+                    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                    const response = await fetch('/api/reservations', {
+                        method: 'POST',
+                        headers,
+                        body: JSON.stringify({
+                            name: data.name,
+                            email: data.email,
+                            phone: data.phone,
+                            date: data.date,
+                            time: data.time,
+                            guests: data.guests
+                        })
+                    });
+                    const resData = await response.json();
+                    if (response.ok && resData.success) {
+                        savedOnServer = true;
+                    }
+                } catch (netErr) {
+                    console.warn('API reservation request failed, saving to local DB:', netErr);
+                }
+
+                // 2. Also save to client-side database as backup
+                if (!dbManager && typeof initializeDatabase === 'function') {
                     await initializeDatabase();
                 }
                 
                 if (dbManager) {
-                    // Get current user if logged in
                     const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
                     const userId = currentUser ? currentUser.id : null;
                     
-                    // Add reservation to database
-                    const result = dbManager.addReservation(
+                    dbManager.addReservation(
                         userId,
                         data.name,
                         data.email,
@@ -66,26 +138,14 @@ if (reservationForm) {
                         data.time,
                         data.guests
                     );
-                    
-                    if (result.success) {
-                        if (isArabic) {
-                            alert('شكراً لحجزك! سنتصل بك قريباً للتأكيد.');
-                        } else {
-                            alert('Thank you for your reservation! We will contact you shortly to confirm.');
-                        }
-                        reservationForm.reset();
-                    } else {
-                        alert(isArabic ? result.message : result.message);
-                    }
-                } else {
-                    // Fallback if database fails
-                    if (isArabic) {
-                        alert('شكراً لحجزك! سنتصل بك قريباً للتأكيد.');
-                    } else {
-                        alert('Thank you for your reservation! We will contact you shortly to confirm.');
-                    }
-                    reservationForm.reset();
                 }
+                
+                if (isArabic) {
+                    alert('شكراً لحجزك! سنتصل بك قريباً للتأكيد.');
+                } else {
+                    alert('Thank you for your reservation! We will contact you shortly to confirm.');
+                }
+                reservationForm.reset();
             } catch (error) {
                 console.error('Reservation error:', error);
                 alert(isArabic ? 'حدث خطأ أثناء الحجز.' : 'An error occurred during reservation.');
